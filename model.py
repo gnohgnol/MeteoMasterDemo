@@ -1,0 +1,62 @@
+# - coding: utf-8 -
+
+from sqlalchemy import MetaData, create_engine, Column, String, Date, Integer, UniqueConstraint
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+import urllib
+
+
+metadata = MetaData()
+engine = create_engine('mssql+pymssql://sa:{}@localhost:1433/clouddb'.format(urllib.parse.quote_plus('1835rd@')))
+Base = declarative_base()
+db_session = sessionmaker(bind=engine)()
+
+
+class PigIll(Base):
+    __tablename__ = 'pig_ill'
+    __table_args__ = {"extend_existing": True}
+    damagestartdate = Column(String, primary_key=True)
+    damagestartplace = Column(String, primary_key=True)
+    cunlan = Column(Integer)
+    items = Column(Integer)
+    damage_items = Column(Integer)
+    region = Column(String)
+
+
+class User(Base):
+    __tablename__ = 'meteo_users'
+    __table_args__ = {'extend_existing': True}
+    id = Column(Integer, primary_key=True)
+    username = Column(String(128), nullable=False, index=True)
+    password = Column(String(128), nullable=False)
+    region = Column(String(128), nullable=False)
+    UniqueConstraint(username, region, name='PK_User_username_region')
+
+
+Base.metadata.create_all(engine)
+
+def get_records():
+    return db_session.query(PigIll)
+
+def get_loss_times(record):
+    return record.damagestartdate
+
+def get_cunlan(record):
+    return record.cunlan
+
+def get_loss(record):
+    return record.items
+
+def get_damage(record):
+    return record.damage_items
+
+def get_place(record):
+    return record.region, record.damagestartplace
+
+data = get_records()
+CITIES = [get_place(r) for r in data]
+
+def get_users():
+    return db_session.query(User)
+
+users = get_users()

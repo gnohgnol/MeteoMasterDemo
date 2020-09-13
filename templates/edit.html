@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh">
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="../static/style.css">
+        <title>编辑 {{ region }} 数据库</title>
+    </head>
+    <body>
+        <p>正确编辑 {{ region }} 的数据:</p>
+        <div class="container">
+            <form name="meteoInput" action="" class="form-inline" method="post">
+                <table>
+                    <tr>
+                        <td colspan="2" align="center">出险时间</td>
+                        <td colspan="2" align="center">出险地点</td>
+                        <td colspan="2" align="center">存栏量（运输量）</td>
+                        <td colspan="2" align="center">发病量</td>
+                        <td colspan="2" align="center">病死量</td>
+                    </tr>
+                    {% for rd in records %}
+                    <tr>
+                        <td>
+                            <input placeholder="20" class="form-control" name="damagestartdate{{ loop.index0 }}" value="{{ rd[0]}}"/>
+                        </td>
+                        <td>
+                            <input placeholder="20" class="form-control" name="damagestartplace{{ loop.index0 }}" value="{{ rd[1] }}"/>
+                        </td>
+                        <td>
+                            <input placeholder="20" class="form-control" name="cunlan{{ loop.index0 }}" value="{{ rd[2] }}" />
+                        </td>
+                        <td>
+                            <input placeholder="20" class="form-control" name="items{{ loop.index0 }}" value="{{ rd[3] }}" />
+                        </td>
+                        <td>
+                            <input placeholder="20" class="form-control" name="damage_items{{ loop.index0 }}" value="{{ rd[4] }}" />
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <input class="btn btn-default" type="submit" value="保存" />
+            </form>
+            <p>{{ error }}</p>
+        </div>
+    </body>
+</html>
+
