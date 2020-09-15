@@ -20,7 +20,7 @@
                     {% for rd in records %}
                     <tr>
                         <td>
-                            <input placeholder="20" class="form-control" name="damagestartdate{{ loop.index0 }}" value="{{ rd[0]}}"/>
+                            <input placeholder="20" class="form-control" name="damagestartdate{{ loop.index0 }}" value='{{ rd[0] | dateformat("%Y-%m-%d") }}'/>
                         </td>
                         <td>
                             <input placeholder="20" class="form-control" name="damagestartplace{{ loop.index0 }}" value="{{ rd[1] }}"/>

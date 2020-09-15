@@ -4,6 +4,7 @@ from sqlalchemy import MetaData, create_engine, Column, String, Date, Integer, U
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import urllib
+import datetime
 
 
 metadata = MetaData()
@@ -39,7 +40,9 @@ def get_records():
     return db_session.query(PigIll)
 
 def get_loss_times(record):
-    return record.damagestartdate
+    days = int(record.damagestartdate)-1
+    startdate = datetime.date(1900,1,1)
+    return startdate + datetime.timedelta(days=days) ## problem excel
 
 def get_cunlan(record):
     return record.cunlan

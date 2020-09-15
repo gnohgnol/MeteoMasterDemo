@@ -4,12 +4,25 @@ from flask import Flask, render_template, send_file, flash, request, redirect, u
 import os
 from werkzeug.utils import secure_filename
 from chars import *
+from jinja2 import Environment, PackageLoader
+import datetime
+
+
+
+def dateformat(value, format="%Y-%m"):
+    return value.strftime(format)
+
+#env=Environment(loader=PackageLoader('app','templates'))
+#env.filters['dateformat'] = dateformat
+
 
 UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'md'])
 
+
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.jinja_env.filters['dateformat'] = dateformat
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -105,20 +118,22 @@ app.secret_key = os.environ['FLASK_WEB_APP_KEY']
 def edit_database(region):
     """Views for editing city specific data"""
     records = [(get_loss_times(r), get_place(r)[1], get_cunlan(r), get_loss(r), get_damage(r)) for r in data.filter_by(region=region)]
-
+    print(len(records))
+    print('method={}'.format(request.method))
     try:
         if request.method == "POST":
             for i in range(len(records)):
                 damagestartdate = request.form[f'damagestartdate{i}']
                 damagestartplace = request.form[f'damagestartplace{i}']
-                cunlan = int(request.form[f'cunlan{i}'])
-                items = int(request.form[f'items{i}'])
-                damage_items = int(request.form[f'damage_items{i}'])
+                cunlan = request.form[f'cunlan{i}']
+                items = request.form[f'items{i}']
+                damage_items = request.form[f'damage_items{i}']
+                print('date: {} place: {} cunlan: {} items: {} damage_items: {}'.format(damagestartdate, damagestartplace, cunlan, items, damage_items))
                 it = data.filter_by(damagestartdate=damagestartdate, damagestartplace=damagestartplace).first()
                 if it:
-                    it.cunlan = cunlan
-                    it.items = items
-                    it.damage_items = damage_items
+                    it.cunlan = cunlan if cunlan != 'None' else None
+                    it.items = items if items != 'None' else None
+                    it.damage_items = damage_items if damage_items != 'None' else None
                 else:
                     pass
                 #db_session.execute(PigIll.__table__.insert(), self.dicts)
