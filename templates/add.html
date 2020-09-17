@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="../static/style.css">
+    <title>新增 {{ region }} 记录</title>
+</head>
+<body>
+    <div class="container">
+        <form name="meteoInput" action="" class="form-inline" method="post">
+            <div class="form-group">
+                <label class="form-control">出险时间</label>
+                <input type="text" class="form-control" name="damagestartdate" value="{{ request.form.damagestartdate }}" placeholder="" />
+            </div>
+            <div class="form-group">
+                <label class="form-control">出险地点</label>
+                <input type="text" class="form-control" name="damagestartplace" value="{{ request.form.damagestartplace }}" placeholder="" />
+            </div>
+            <div class="form-group">
+                <label class="form-control">存栏量（运输量）</label>
+                <input type="text" class="form-control" name="cunlan" value="{{ request.form.cunlan }}" placeholder="0" />
+            </div>
+            <div class="form-group">
+                <label class="form-control">发病量</label>
+                <input type="text" class="form-control" name="items" value="{{ request.form.items }}" placeholder="0" />
+            </div>
+            <div class="form-group">
+                <label class="form-control">病死量</label>
+                <input type="text" class="form-control" name="damage_items" value="{{ request.form.damage_items }}" placeholder="0" />
+            </div>
+            <input class="btn btn-default" type="submit" value="新增" />
+        </form>
+        <p>{{ error }}</p>
+    </div>
+</body>
+</html>

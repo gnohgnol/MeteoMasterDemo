@@ -147,6 +147,36 @@ def edit_database(region):
         return render_template('edit.html', region=region, records=records, error=error)
 
 
+@app.route('/add/<string:region>', methods=["GET", "POST"])
+@login_required
+def edit_database_add(region):
+    print(session['username'],session['logged_in'])
+    try:
+        if request.method == 'POST':
+            print('method={}'.format(request.method))
+            r = PigIll(
+                damagestartdate = (datetime.datetime.strptime(request.form['damagestartdate'], '%Y-%m-%d')-datetime.datetime(1900,1,1)).days+1,
+                damagestartplace = request.form['damagestartplace'],
+                cunlan = int(request.form['cunlan']),
+                items = int(request.form['items']),
+                damage_items = int(request.form['damage_items']),
+                region = region)
+            print(r.damagestartdate, r.damagestartplace, r.cunlan, r.items, r.damage_items, r.region)
+            db_session.add(r)
+            db_session.commit()
+            return redirect(url_for('edit_database', region=region))
+        else:
+            return render_template('add.html', region=region)
+    except Exception as error:
+        print(error)
+        db_session.rollback()
+        return render_template('add.html', region=region)
+
+
+# @app.teardown_appcontext
+# def shutdown_session(exception=None):
+#     db_session.remove()
+
 
 if __name__ == '__main__':
     app.run()
