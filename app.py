@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from chars import *
 from jinja2 import Environment, PackageLoader
 import datetime
+from register_form import *
 
 
 
@@ -176,6 +177,21 @@ def edit_database_add(region):
 # @app.teardown_appcontext
 # def shutdown_session(exception=None):
 #     db_session.remove()
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm(request.form)
+    if request.method == 'POST' and form.validate():
+        region = form.region.data
+        user = User(username=form.username.data,
+                    password=form.password.data,
+                    region=region)
+        db_session.add(user)
+        flash('Thanks for registering')
+        return redirect(url_for('login', region=region))
+    return render_template('register.html', form=form)
+
 
 
 if __name__ == '__main__':

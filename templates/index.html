@@ -8,6 +8,8 @@
 </head>
 <body>
     <div class="container">
+        <p>还未注册？开始<a href="{{ url_for('register') }}">注册</a></p>
+
         <div id='element1' >
             <img src="{{ url_for('main_plot') }}" alt="Image">
         </div>
@@ -20,8 +22,6 @@
                     {% endfor %}
             </ul>
         </div>
-
-
 
         <h1>上传您地区申报的扑杀补贴标准</h1>
         <form method=post enctype=multipart/form-data>
