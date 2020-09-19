@@ -31,6 +31,7 @@ class User(Base):
     username = Column(String(128), nullable=False, index=True)
     password = Column(String(128), nullable=False)
     region = Column(String(128), nullable=False)
+    iconPath = Column(String(256), nullable=True)
     UniqueConstraint(username, region, name='PK_User_username_region')
 
 

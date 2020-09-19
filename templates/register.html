@@ -8,13 +8,15 @@
 </head>
 <body>
     {% from "_formhelpers.html" import render_field %}
-    <form method=post>
+    <form method=post enctype='multipart/form-data'>
       <dl>
-        {{ render_field(form.username) }}
-        {{ render_field(form.region) }}
-        {{ render_field(form.password) }}
-        {{ render_field(form.confirm) }}
-        {{ render_field(form.accept_tos) }}
+          {{ render_field(form.username) }}
+          {{ render_field(form.region) }}
+          <dt>头像图片：</dt>
+          <dd><input type="file" name="icon" /></dd>
+          {{ render_field(form.password) }}
+          {{ render_field(form.confirm) }}
+          {{ render_field(form.accept_tos) }}
       </dl>
       <p><input type=submit value="注册">
     </form>

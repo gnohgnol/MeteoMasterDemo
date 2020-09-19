@@ -6,6 +6,8 @@ from werkzeug.utils import secure_filename
 from chars import *
 from jinja2 import Environment, PackageLoader
 import datetime
+
+from login_form import LoginForm
 from register_form import *
 
 
@@ -59,7 +61,7 @@ def region_plot(region):
     return send_file(img, mimetype='image/png', cache_timeout=0,)
 
 
-@app.route('/uploads/<filename>')
+@app.route('/uploads/<string:filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
@@ -79,22 +81,23 @@ def login(region):
     """The view for the login page"""
     try:
         error = ''
-        if request.method == "POST":
-            attempted_username = request.form['username']
-            attempted_password = request.form['password']
+        form = LoginForm(request.form)
+        if request.method == "POST" and form.validate():
+            attempted_username = form.username.data
+            attempted_password = form.password.data
             user_found = users.filter_by(username=attempted_username, region=region).first()
             password = user_found.password
-            print('input={},db={}'.format(attempted_password, password))
             if attempted_password == password:
                 session['logged_in'] = True
                 session['username'] = user_found.username
+                session['icon'] = user_found.iconPath
                 return redirect(url_for('edit_database', region=region))
             else:
                 print('invalid credentials')
                 error = 'Invalid credentials. Please, try again.'
-        return render_template('login.html', error=error, region=region)
+        return render_template('login.html', error=error, region=region, form=form)
     except Exception as e:
-        return render_template('login.html', error=str(e), region=region)
+        return render_template('login.html', error=str(e), region=region, form=form)
 
 
 def login_required(f):
@@ -119,8 +122,8 @@ app.secret_key = os.environ['FLASK_WEB_APP_KEY']
 def edit_database(region):
     """Views for editing city specific data"""
     records = [(get_loss_times(r), get_place(r)[1], get_cunlan(r), get_loss(r), get_damage(r)) for r in data.filter_by(region=region)]
-    print(len(records))
-    print('method={}'.format(request.method))
+    #print(len(records))
+    #print('method={}'.format(request.method))
     try:
         if request.method == "POST":
             for i in range(len(records)):
@@ -182,15 +185,30 @@ def edit_database_add(region):
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm(request.form)
-    if request.method == 'POST' and form.validate():
+    print('-----------------1')
+    #if request.method == 'POST' and form.validate():
+    if request.method == 'POST':
+        print('-----------------2')
         region = form.region.data
+        file = request.files['icon']
+        print('{}'.format(file))
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            iconPath = filename
+            file.save( os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            #return redirect(url_for('uploaded_file', filename=filename))
+        print('-----------------5')
         user = User(username=form.username.data,
                     password=form.password.data,
-                    region=region)
+                    region=region,
+                    iconPath=iconPath)
         db_session.add(user)
+        db_session.commit()
         flash('Thanks for registering')
         return redirect(url_for('login', region=region))
-    return render_template('register.html', form=form)
+    else:
+        print('-----------------3')
+        return render_template('register.html', form=form)
 
 
 

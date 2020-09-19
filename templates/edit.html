@@ -7,7 +7,9 @@
         <title>编辑 {{ region }} 数据库</title>
     </head>
     <body>
-        <p>正确编辑 {{ region }} 的数据:</p>
+        <p>
+        <img src="{{ url_for('uploaded_file', filename=session['icon']) }}" alt="Image" height="50" width="50"> {{ session['username'] }} 正确编辑 {{ region }} 的数据:
+        </p>
         <div class="container">
             <form name="meteoInput" action="" class="form-inline" method="post">
                 <table>
