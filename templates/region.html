@@ -8,10 +8,11 @@
 </head>
 <body>
     <div id="element1">
+        <p>地区 {{ region }} 的疫情图</p>
         <img src="{{ url_for('region_plot', region=region) }}" alt="Image">
     </div>
     <div id="element2">
-        <p>下列城市已经发生疫情: </p>
+        <p>疫情播报: </p>
         <ul>
                 {% for city in cities %}
                 <li><a href="">{{ city }}</a></li>
@@ -19,7 +20,27 @@
         </ul>
     </div>
     <div id="element3">
-        <p>地区 {{ region }} 的疫情图</p>
+        <table>
+            <tr>
+                <td>文件名：</td>
+                <td>公布时间：</td>
+            </tr>
+            {% for d in docs %}
+            <tr>
+                <td><a href="{{ url_for('uploaded_file', filename=region+'/'+d['filePath']) }}">{{ d['filePath'] }}</a></td>
+                <td>{{ d['publish_datetime'] | dateformat("%Y-%m-%d") }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <h1>上传地区扑杀补贴标准：</h1>
+        <form method=post enctype=multipart/form-data class="form-inline">
+            <div class="form-group">
+                <input type="file" name="file" class="form-control-file"/>
+            </div>
+            <input type="submit" class="btn btn-primary" value="提交"/>
+        </form>
+    </div>
+    <div id="element4">
         {% if session['logged_in'] %}
             <p>希望上报新疫情?</p>
             <p>访问 <a href="{{ url_for('edit_database', region=region) }}">编辑</a> 该地区数据库</p>

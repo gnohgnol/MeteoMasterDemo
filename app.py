@@ -20,7 +20,7 @@ def dateformat(value, format="%Y-%m"):
 
 
 UPLOAD_FOLDER = 'static/uploads'
-ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'md'])
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'md', 'wps'])
 
 
 app = Flask(__name__)
@@ -30,6 +30,14 @@ app.jinja_env.filters['dateformat'] = dateformat
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    regions = set([r[0] for r in CITIES])
+    return render_template('index.html', regions=regions)
+
+
+@app.route('/region/<string:region>', methods=['GET', 'POST'])
+def region(region):
+    """Views for the city details"""
+
     if request.method == 'POST':
         if 'file' not in request.files:
             flash('No file part')
@@ -40,18 +48,19 @@ def index():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('uploaded_file', filename=filename))
-    regions = set([r[0] for r in CITIES])
-    return render_template('index.html', regions=regions)
-
-
-@app.route('/region/<string:region>')
-def region(region):
-    """Views for the city details"""
+            os.makedirs(os.path.join(os.path.join(app.config['UPLOAD_FOLDER'], region)), exist_ok=True)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], region, filename))
+            # return redirect(url_for('uploaded_file', filename=filename))
+            doc = Document(
+                publish_datetime = datetime.datetime.now(),
+                filePath = filename,
+                region=region)
+            db_session.add(doc)
+            db_session.commit()
 
     cities = [r[1] for r in CITIES if r[0] == region]
-    return render_template('region.html', region=region, cities=cities)
+    docs = db_session.query(Document).filter_by(region=region)
+    return render_template('region.html', region=region, cities=cities, docs=docs)
 
 
 @app.route('/region<string:region>.png')
@@ -185,19 +194,16 @@ def edit_database_add(region):
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm(request.form)
-    print('-----------------1')
     #if request.method == 'POST' and form.validate():
     if request.method == 'POST':
-        print('-----------------2')
         region = form.region.data
         file = request.files['icon']
-        print('{}'.format(file))
+        #print('{}'.format(file))
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
             iconPath = filename
             file.save( os.path.join(app.config['UPLOAD_FOLDER'], filename))
             #return redirect(url_for('uploaded_file', filename=filename))
-        print('-----------------5')
         user = User(username=form.username.data,
                     password=form.password.data,
                     region=region,
@@ -207,7 +213,6 @@ def register():
         flash('Thanks for registering')
         return redirect(url_for('login', region=region))
     else:
-        print('-----------------3')
         return render_template('register.html', form=form)
 
 

@@ -1,6 +1,6 @@
 # - coding: utf-8 -
 
-from sqlalchemy import MetaData, create_engine, Column, String, Date, Integer, UniqueConstraint
+from sqlalchemy import MetaData, create_engine, Column, String, Date, Integer, UniqueConstraint, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import urllib
@@ -33,6 +33,15 @@ class User(Base):
     region = Column(String(128), nullable=False)
     iconPath = Column(String(256), nullable=True)
     UniqueConstraint(username, region, name='PK_User_username_region')
+
+
+class Document(Base):
+    __tablename__ = 'meteo_doc'
+    __table_args__ = {'extend_existing': True}
+    id = Column(Integer, primary_key=True)
+    publish_datetime = Column(DateTime, nullable=False)
+    filePath = Column(String(500), nullable=False)
+    region = Column(String(128), nullable=False)
 
 
 Base.metadata.create_all(engine)
