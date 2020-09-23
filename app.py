@@ -6,7 +6,7 @@ from werkzeug.utils import secure_filename
 from chars import *
 from jinja2 import Environment, PackageLoader
 import datetime
-
+import dotenv
 from login_form import LoginForm
 from register_form import *
 
